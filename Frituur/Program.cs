@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Frituur.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<FrituurContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("FrituurContext") ?? throw new InvalidOperationException("Connection string 'FrituurContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
