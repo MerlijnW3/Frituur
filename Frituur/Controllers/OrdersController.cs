@@ -49,25 +49,45 @@ namespace Frituur.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
+            var viewModel = new OrderViewModel
+            {
+                Products = _context.Product.Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Name
+                }).ToList()
+            };
+
             ViewData["userId"] = new SelectList(_context.User, "Id", "Id");
-            return View();
+            return View(viewModel);
         }
 
         // POST: Orders/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,userId")] Order order)
+        public async Task<IActionResult> Create(OrderViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
+                var order = new Order
+                {
+                    userId = viewModel.UserId,
+                    Products = viewModel.SelectedProductIds.Select(productId => _context.Product.Find(productId)).ToList()
+                };
+
                 _context.Add(order);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["userId"] = new SelectList(_context.User, "Id", "Id", order.userId);
-            return View(order);
+
+            viewModel.Products = _context.Product.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.Name
+            }).ToList();
+
+            ViewData["userId"] = new SelectList(_context.User, "Id", "Id", viewModel.UserId);
+            return View(viewModel);
         }
 
         // GET: Orders/Edit/5
@@ -78,23 +98,36 @@ namespace Frituur.Controllers
                 return NotFound();
             }
 
-            var order = await _context.Order.FindAsync(id);
+            var order = await _context.Order
+                .Include(o => o.Products)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
                 return NotFound();
             }
+
+            var viewModel = new OrderViewModel
+            {
+                Id = order.Id,
+                UserId = order.userId,
+                SelectedProductIds = order.Products.Select(p => p.Id).ToList(),
+                Products = _context.Product.Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Name
+                }).ToList()
+            };
+
             ViewData["userId"] = new SelectList(_context.User, "Id", "Id", order.userId);
-            return View(order);
+            return View(viewModel);
         }
 
         // POST: Orders/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,userId")] Order order)
+        public async Task<IActionResult> Edit(int id, OrderViewModel viewModel)
         {
-            if (id != order.Id)
+            if (id != viewModel.Id)
             {
                 return NotFound();
             }
@@ -103,12 +136,24 @@ namespace Frituur.Controllers
             {
                 try
                 {
+                    var order = await _context.Order
+                        .Include(o => o.Products)
+                        .FirstOrDefaultAsync(m => m.Id == id);
+
+                    if (order == null)
+                    {
+                        return NotFound();
+                    }
+
+                    order.userId = viewModel.UserId;
+                    order.Products = viewModel.SelectedProductIds.Select(productId => _context.Product.Find(productId)).ToList();
+
                     _context.Update(order);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!OrderExists(order.Id))
+                    if (!OrderExists(viewModel.Id))
                     {
                         return NotFound();
                     }
@@ -119,8 +164,15 @@ namespace Frituur.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["userId"] = new SelectList(_context.User, "Id", "Id", order.userId);
-            return View(order);
+
+            viewModel.Products = _context.Product.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.Name
+            }).ToList();
+
+            ViewData["userId"] = new SelectList(_context.User, "Id", "Id", viewModel.UserId);
+            return View(viewModel);
         }
 
         // GET: Orders/Delete/5
