@@ -13,10 +13,8 @@ namespace Frituur.Data
             : base(options)
         {
         }
-
-        public DbSet<Frituur.Models.Gebruiker> Gebruiker { get; set; } = default!;
         public DbSet<Frituur.Models.Product> Product { get; set; } = default!;
-        public DbSet<Frituur.Models.Bestelling> Bestelling { get; set; } = default!;
-        public DbSet<Frituur.Models.BestProdKoppel> BestProdKoppel { get; set; } = default!;
+        public DbSet<Frituur.Models.User> User { get; set; } = default!;
+        public DbSet<Frituur.Models.Order> Order { get; set; } = default!;
     }
 }
