@@ -19,4 +19,8 @@
     <None Include="wwwroot\images\Friet.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

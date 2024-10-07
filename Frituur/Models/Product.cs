@@ -7,6 +7,6 @@
         public double? Price { get; set; }
         public string? Photo { get; set; }
         public double? Discount { get; set; }
-        public ICollection<Order>? Orders { get; set; }
+        public ICollection<OrderProduct>? OrderProducts { get; set; }
     }
 }
