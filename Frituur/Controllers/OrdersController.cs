@@ -72,7 +72,8 @@ namespace Frituur.Controllers
                 var order = new Order
                 {
                     userId = viewModel.UserId,
-                    Products = viewModel.SelectedProductIds.Select(productId => _context.Product.Find(productId)).ToList()
+                    Products = viewModel.SelectedProductIds.Select(productId => _context.Product.Find(productId)).ToList(),
+                    OrderDate = DateTime.Now 
                 };
 
                 _context.Add(order);

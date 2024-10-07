@@ -9,7 +9,7 @@ namespace Frituur.Data
 {
     public class FrituurContext : DbContext
     {
-        public FrituurContext (DbContextOptions<FrituurContext> options)
+        public FrituurContext(DbContextOptions<FrituurContext> options)
             : base(options)
         {
         }
@@ -18,3 +18,4 @@ namespace Frituur.Data
         public DbSet<Frituur.Models.Order> Order { get; set; } = default!;
     }
 }
+

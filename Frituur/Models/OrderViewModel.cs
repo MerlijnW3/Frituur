@@ -10,6 +10,7 @@ namespace Frituur.Models
         public string? UserName { get; set; }
         public List<int> SelectedProductIds { get; set; }
         public List<SelectListItem> Products { get; set; }
+        public DateTime OrderDate { get; set; }
 
         public OrderViewModel()
         {

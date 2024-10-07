@@ -6,5 +6,7 @@
         public int userId { get; set; }
         public User? User { get; set; }
         public ICollection<Product>? Products { get; set; }
+        public DateTime OrderDate { get; set; }
     }
 }
+
