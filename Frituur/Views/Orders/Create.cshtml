@@ -1,10 +1,10 @@
-﻿@model Frituur.Models.Order
+﻿@model Frituur.Models.OrderViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Order";
 }
 
-<h1>Create</h1>
+<h1>Create Order</h1>
 
 <h4>Order</h4>
 <hr />
@@ -13,8 +13,14 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="userId" class="control-label"></label>
-                <select asp-for="userId" class ="form-control" asp-items="ViewBag.userId"></select>
+                <label asp-for="UserId" class="control-label"></label>
+                <select asp-for="UserId" class="form-control" asp-items="ViewBag.userId"></select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedProductIds" class="control-label">Products</label>
+                <select asp-for="SelectedProductIds" class="form-control" asp-items="Model.Products" multiple="multiple"></select>
+                <span asp-validation-for="SelectedProductIds" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -28,5 +34,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

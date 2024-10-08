@@ -45,12 +45,23 @@ namespace Frituur.Controllers
             return View(order);
         }
 
+
         // GET: Orders/Create
         public IActionResult Create()
         {
+            ViewData["Title"] = "Create Order";
+            var viewModel = new OrderViewModel
+            {
+                Products = _context.Product.Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Name
+                }).ToList()
+            };
             ViewData["userId"] = new SelectList(_context.User, "Id", "Id");
-            return View();
+            return View(viewModel);
         }
+
 
         // POST: Orders/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -82,6 +93,7 @@ namespace Frituur.Controllers
             {
                 return NotFound();
             }
+            ViewData["Title"] = "Edit Order";
             ViewData["userId"] = new SelectList(_context.User, "Id", "Id", order.userId);
             return View(order);
         }
