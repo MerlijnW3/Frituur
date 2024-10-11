@@ -1,30 +1,73 @@
-﻿@model Frituur.Models.Order
+﻿@model Frituur.Models.OrderDetailsViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Order Details";
 }
 
-<h1>Details</h1>
+<h1>Order Details</h1>
 
 <div>
     <h4>Order</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
+        <dt class="col-sm-2">
+            Order ID
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Id)
+        <dd class="col-sm-10">
+            @Model.OrderId
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OrderDate)
+        <dt class="col-sm-2">
+            User ID
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OrderDate)
+        <dd class="col-sm-10">
+            @Model.UserId
+        </dd>
+        <dt class="col-sm-2">
+            Order Date
+        </dt>
+        <dd class="col-sm-10">
+            @Model.OrderDate
         </dd>
     </dl>
 </div>
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <h4>Products</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Discount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model.Products)
+            {
+                <tr>
+                    <td>@product.ProductName</td>
+                    <td>@product.Quantity</td>
+                    <td>@product.Price.ToString("C")</td>
+                    <td>@(product.Discount.HasValue ? product.Discount.Value.ToString("C") : "No Discount")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h4>Summary</h4>
+    <dl class="row">
+        <dt class="col-sm-2">
+            Total Cost
+        </dt>
+        <dd class="col-sm-10">
+            @Model.TotalCost.ToString("C")
+        </dd>
+    </dl>
+</div>
+
+<div>
     <a asp-action="Index">Back to List</a>
 </div>

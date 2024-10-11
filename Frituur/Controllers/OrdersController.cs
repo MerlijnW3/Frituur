@@ -36,14 +36,39 @@ namespace Frituur.Controllers
 
             var order = await _context.Order
                 .Include(o => o.User)
+                .Include(o => o.OrderProducts)
+                .ThenInclude(op => op.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (order == null)
             {
                 return NotFound();
             }
 
-            return View(order);
+            var products = order.OrderProducts.Select(op => new ProductQuantity
+            {
+                ProductName = op.Product.Name,
+                Quantity = op.Quantity,
+                Price = (double)op.Product.Price,
+                Discount = (double?)op.Product.Discount 
+            }).ToList();
+
+            var totalCost = products.Sum(p => (p.Price - (p.Discount ?? 0)) * p.Quantity);
+
+            var viewModel = new OrderDetailsViewModel
+            {
+                OrderId = order.Id,
+                UserId = order.userId,
+                OrderDate = order.OrderDate,
+                Products = products,
+                TotalCost = totalCost
+            };
+
+            return View(viewModel);
         }
+
+
+
 
 
         // GET: Orders/Create
@@ -68,17 +93,45 @@ namespace Frituur.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,userId,OrderDate")] Order order)
+        public async Task<IActionResult> Create(OrderViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
+                var order = new Order
+                {
+                    userId = viewModel.UserId,
+                    OrderDate = DateTime.Now,
+                    OrderProducts = new List<OrderProduct>()
+                };
+
+                for (int i = 0; i < viewModel.SelectedProductIds.Count; i++)
+                {
+                    if (viewModel.Quantities[i] > 0)
+                    {
+                        order.OrderProducts.Add(new OrderProduct
+                        {
+                            ProductId = viewModel.SelectedProductIds[i],
+                            Quantity = viewModel.Quantities[i]
+                        });
+                    }
+                }
+
                 _context.Add(order);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["userId"] = new SelectList(_context.User, "Id", "Id", order.userId);
-            return View(order);
+
+            ViewData["userId"] = new SelectList(_context.User, "Id", "Id", viewModel.UserId);
+            viewModel.Products = _context.Product.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.Name
+            }).ToList();
+            return View(viewModel);
         }
+
+
+
 
         // GET: Orders/Edit/5
         public async Task<IActionResult> Edit(int? id)
