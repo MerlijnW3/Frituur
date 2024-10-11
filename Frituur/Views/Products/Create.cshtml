@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" id="createProductForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
@@ -44,5 +44,27 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Regex for validating numbers with commas or dots as decimal separators
+        $.validator.methods.number = function (value, element) {
+            return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d+)?$/.test(value) || /^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(value);
+        };
+
+        document.getElementById('createProductForm').addEventListener('submit', function () {
+            var priceInput = document.querySelector('input[name="Price"]');
+            var discountInput = document.querySelector('input[name="Discount"]');
+
+            if (priceInput) {
+                priceInput.value = priceInput.value.replace(',', '.');
+            }
+
+            if (discountInput) {
+                discountInput.value = discountInput.value.replace(',', '.');
+            }
+        });
+    </script>
 }
+

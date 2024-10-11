@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" id="editProductForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -45,5 +45,26 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Custom validator to accept only numbers with periods or commas as decimal separators
+        $.validator.methods.number = function (value, element) {
+            return this.optional(element) || /^-?\d+([.,]\d+)?$/.test(value);
+        };
+
+        document.getElementById('editProductForm').addEventListener('submit', function () {
+            var priceInput = document.querySelector('input[name="Price"]');
+            var discountInput = document.querySelector('input[name="Discount"]');
+
+            if (priceInput) {
+                priceInput.value = priceInput.value.replace(',', '.');
+            }
+
+            if (discountInput) {
+                discountInput.value = discountInput.value.replace(',', '.');
+            }
+        });
+    </script>
 }

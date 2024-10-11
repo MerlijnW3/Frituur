@@ -58,11 +58,24 @@ namespace Frituur.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Ensure Price and Discount are correctly parsed
+                product.Price = ParseDouble(Request.Form["Price"]);
+                product.Discount = ParseDouble(Request.Form["Discount"]);
+
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
+        }
+
+        private double? ParseDouble(string value)
+        {
+            if (double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double result))
+            {
+                return result;
+            }
+            return null;
         }
 
         // GET: Products/Edit/5
@@ -97,6 +110,10 @@ namespace Frituur.Controllers
             {
                 try
                 {
+                    // Ensure Price and Discount are correctly parsed
+                    product.Price = ParseDouble(Request.Form["Price"]);
+                    product.Discount = ParseDouble(Request.Form["Discount"]);
+
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
@@ -115,6 +132,7 @@ namespace Frituur.Controllers
             }
             return View(product);
         }
+
 
         // GET: Products/Delete/5
         public async Task<IActionResult> Delete(int? id)

@@ -225,5 +225,41 @@ namespace Frituur.Controllers
         {
             return _context.Order.Any(e => e.Id == id);
         }
+
+        public async Task<IActionResult> Reorder(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var order = await _context.Order
+                .Include(o => o.OrderProducts)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new OrderViewModel
+            {
+                UserId = order.userId,
+                SelectedProductIds = order.OrderProducts.Select(op => op.ProductId).ToList(),
+                Quantities = order.OrderProducts.Select(op => op.Quantity).ToList(),
+                Products = _context.Product.Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Name
+                }).ToList()
+            };
+
+            ViewData["userId"] = new SelectList(_context.User, "Id", "Id", order.userId);
+            return View("Create", viewModel);
+        }
+
+
+
+
     }
 }

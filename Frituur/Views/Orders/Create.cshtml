@@ -24,7 +24,7 @@
                     <div class="form-group">
                         <label>@Model.Products.ElementAt(i).Text</label>
                         <input type="hidden" name="SelectedProductIds[@i]" value="@Model.Products.ElementAt(i).Value" />
-                        <input class="form-control" type="number" name="Quantities[@i]" min="0" value="0" />
+                        <input class="form-control" type="number" name="Quantities[@i]" min="0" value="@Model.Quantities.ElementAtOrDefault(i)" />
                     </div>
                 }
                 <span asp-validation-for="SelectedProductIds" class="text-danger"></span>
