@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Frituur.Data;
 using Frituur.Models;
@@ -50,17 +50,24 @@ namespace Frituur.Controllers
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Price,Photo,Discount")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,Name,Price,Discount")] Product product, IFormFile photo)
         {
             if (ModelState.IsValid)
             {
                 // Ensure Price and Discount are correctly parsed
                 product.Price = ParseDouble(Request.Form["Price"]);
                 product.Discount = ParseDouble(Request.Form["Discount"]);
+
+                if (photo != null && photo.Length > 0)
+                {
+                    using (var memoryStream = new System.IO.MemoryStream())
+                    {
+                        await photo.CopyToAsync(memoryStream);
+                        product.Photo = PhotoConverter.ConvertToBase64String(memoryStream.ToArray());
+                    }
+                }
 
                 _context.Add(product);
                 await _context.SaveChangesAsync();
@@ -95,11 +102,9 @@ namespace Frituur.Controllers
         }
 
         // POST: Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Photo,Discount")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Discount")] Product product, IFormFile photo)
         {
             if (id != product.Id)
             {
@@ -113,6 +118,21 @@ namespace Frituur.Controllers
                     // Ensure Price and Discount are correctly parsed
                     product.Price = ParseDouble(Request.Form["Price"]);
                     product.Discount = ParseDouble(Request.Form["Discount"]);
+
+                    if (photo != null && photo.Length > 0)
+                    {
+                        using (var memoryStream = new System.IO.MemoryStream())
+                        {
+                            await photo.CopyToAsync(memoryStream);
+                            product.Photo = PhotoConverter.ConvertToBase64String(memoryStream.ToArray());
+                        }
+                    }
+                    else
+                    {
+                        // Preserve existing photo if no new photo is uploaded
+                        var existingProduct = await _context.Product.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+                        product.Photo = existingProduct?.Photo;
+                    }
 
                     _context.Update(product);
                     await _context.SaveChangesAsync();
@@ -132,7 +152,6 @@ namespace Frituur.Controllers
             }
             return View(product);
         }
-
 
         // GET: Products/Delete/5
         public async Task<IActionResult> Delete(int? id)

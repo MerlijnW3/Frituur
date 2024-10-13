@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Frituur.Models;
 
 namespace Frituur.Data
@@ -13,9 +9,11 @@ namespace Frituur.Data
             : base(options)
         {
         }
+
         public DbSet<Frituur.Models.Product> Product { get; set; } = default!;
         public DbSet<Frituur.Models.User> User { get; set; } = default!;
         public DbSet<Frituur.Models.Order> Order { get; set; } = default!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Order>()
@@ -34,7 +32,12 @@ namespace Frituur.Data
                 .HasOne(op => op.Product)
                 .WithMany(p => p.OrderProducts)
                 .HasForeignKey(op => op.ProductId);
+
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.Property(e => e.Photo)
+                      .HasColumnType("nvarchar(max)");
+            });
         }
     }
 }
-
