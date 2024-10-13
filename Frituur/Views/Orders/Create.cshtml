@@ -23,6 +23,10 @@
                 {
                     <div class="form-group">
                         <label>@Model.Products.ElementAt(i).Text</label>
+                        @if (i < Model.ProductPhotos.Count)
+                        {
+                            <img src="data:image/jpeg;base64,@Model.ProductPhotos[i]" alt="Product Image" style="width:100px;height:auto;" />
+                        }
                         <input type="hidden" name="SelectedProductIds[@i]" value="@Model.Products.ElementAt(i).Value" />
                         <input class="form-control" type="number" name="Quantities[@i]" min="0" value="@Model.Quantities.ElementAtOrDefault(i)" />
                     </div>

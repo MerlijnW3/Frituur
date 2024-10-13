@@ -16,5 +16,7 @@ namespace Frituur.Models
 
         [Required]
         public List<int> Quantities { get; set; } = new List<int>();
+
+        public List<string> ProductPhotos { get; set; } = new List<string>();
     }
 }

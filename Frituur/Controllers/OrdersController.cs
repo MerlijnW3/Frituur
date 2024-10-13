@@ -50,7 +50,7 @@ namespace Frituur.Controllers
                 ProductName = op.Product.Name,
                 Quantity = op.Quantity,
                 Price = (double)op.Product.Price,
-                Discount = (double?)op.Product.Discount 
+                Discount = (double?)op.Product.Discount
             }).ToList();
 
             var totalCost = products.Sum(p => (p.Price - (p.Discount ?? 0)) * p.Quantity);
@@ -67,10 +67,6 @@ namespace Frituur.Controllers
             return View(viewModel);
         }
 
-
-
-
-
         // GET: Orders/Create
         public IActionResult Create()
         {
@@ -81,12 +77,12 @@ namespace Frituur.Controllers
                 {
                     Value = p.Id.ToString(),
                     Text = p.Name
-                }).ToList()
+                }).ToList(),
+                ProductPhotos = _context.Product.Select(p => p.Photo).ToList()
             };
             ViewData["userId"] = new SelectList(_context.User, "Id", "Id");
             return View(viewModel);
         }
-
 
         // POST: Orders/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -129,9 +125,6 @@ namespace Frituur.Controllers
             }).ToList();
             return View(viewModel);
         }
-
-
-
 
         // GET: Orders/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -257,9 +250,5 @@ namespace Frituur.Controllers
             ViewData["userId"] = new SelectList(_context.User, "Id", "Id", order.userId);
             return View("Create", viewModel);
         }
-
-
-
-
     }
 }
