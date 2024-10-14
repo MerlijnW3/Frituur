@@ -228,6 +228,7 @@ namespace Frituur.Controllers
 
             var order = await _context.Order
                 .Include(o => o.OrderProducts)
+                .ThenInclude(op => op.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (order == null)
@@ -244,11 +245,13 @@ namespace Frituur.Controllers
                 {
                     Value = p.Id.ToString(),
                     Text = p.Name
-                }).ToList()
+                }).ToList(),
+                ProductPhotos = _context.Product.Select(p => p.Photo).ToList()
             };
 
             ViewData["userId"] = new SelectList(_context.User, "Id", "Id", order.userId);
             return View("Create", viewModel);
         }
+
     }
 }
